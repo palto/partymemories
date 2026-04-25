@@ -1,57 +1,47 @@
+import { list } from "@vercel/blob";
+import type { ListBlobResultBlob } from "@vercel/blob";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { UploadZone } from "@/components/upload-zone";
+import { MediaGrid } from "@/components/media-grid";
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+
+async function getBlobs(): Promise<ListBlobResultBlob[]> {
+  try {
+    const { blobs } = await list();
+    return blobs.sort(
+      (a, b) =>
+        new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
+    );
+  } catch {
+    return [];
+  }
+}
+
+export default async function Home() {
+  const blobs = await getBlobs();
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-8 p-8">
-      <div className="text-center space-y-3">
+    <main className="flex min-h-screen flex-col items-center gap-10 p-8">
+      <div className="text-center space-y-2 mt-8">
         <Badge variant="secondary" className="text-sm px-3 py-1">
-          Welcome
-        </Badge>
-        <h1 className="text-5xl font-bold tracking-tight">
           Party Memories
-        </h1>
-        <p className="text-lg text-muted-foreground max-w-md">
-          Capture, share, and relive your best party moments with friends and family.
+        </Badge>
+        <h1 className="text-4xl font-bold tracking-tight">Your Memories</h1>
+        <p className="text-muted-foreground text-sm">
+          Drop in photos and videos to save them forever.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-2xl">
-        <Card className="text-center">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-3xl">📸</CardTitle>
-            <CardTitle className="text-base">Capture</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <CardDescription>Save photos and videos from every celebration.</CardDescription>
-          </CardContent>
-        </Card>
+      <UploadZone />
 
-        <Card className="text-center">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-3xl">🎉</CardTitle>
-            <CardTitle className="text-base">Relive</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <CardDescription>Browse your memories by event, date, or people.</CardDescription>
-          </CardContent>
-        </Card>
-
-        <Card className="text-center">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-3xl">🤝</CardTitle>
-            <CardTitle className="text-base">Share</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <CardDescription>Invite guests to contribute their own shots.</CardDescription>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Button size="lg" className="mt-2">
-        Get Started
-      </Button>
+      {blobs.length === 0 ? (
+        <p className="text-muted-foreground text-sm pt-4">
+          No memories yet — upload your first one above.
+        </p>
+      ) : (
+        <MediaGrid blobs={blobs} />
+      )}
     </main>
   );
 }
