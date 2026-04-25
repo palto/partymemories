@@ -4,12 +4,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-8 p-8 bg-gradient-to-br from-purple-50 to-pink-50">
+    <main className="flex min-h-screen flex-col items-center justify-center gap-8 p-8">
       <div className="text-center space-y-3">
         <Badge variant="secondary" className="text-sm px-3 py-1">
           Welcome
         </Badge>
-        <h1 className="text-5xl font-bold tracking-tight text-gray-900">
+        <h1 className="text-5xl font-bold tracking-tight">
           Party Memories
         </h1>
         <p className="text-lg text-muted-foreground max-w-md">
