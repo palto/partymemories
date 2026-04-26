@@ -133,9 +133,8 @@ export function MediaGrid({ blobs }: { blobs: ListBlobResultBlob[] }) {
           ))}
           {selected && !isVideo && (
             <p className="text-white/50 text-xs text-center tabular-nums">
-              {selected.pathname.split("/").pop()}
-              {dims && <>&nbsp;·&nbsp;{dims.w}×{dims.h}</>}
-              &nbsp;·&nbsp;{formatBytes(selected.size)}
+              {dims ? <>{dims.w}×{dims.h}&nbsp;·&nbsp;</> : null}
+              {formatBytes(selected.size)}
             </p>
           )}
         </DialogContent>
