@@ -4,6 +4,7 @@ import { useCallback, useRef, useState } from "react";
 import { upload } from "@vercel/blob/client";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { compressImage } from "@/lib/compress-image";
 
 interface UploadEntry {
   id: string;
@@ -24,7 +25,11 @@ export function UploadZone() {
       );
       if (!valid.length) return;
 
-      const entries: UploadEntry[] = valid.map((f) => ({
+      const ready = await Promise.all(
+        valid.map((f) => f.type.startsWith("image/") ? compressImage(f) : Promise.resolve(f))
+      );
+
+      const entries: UploadEntry[] = ready.map((f) => ({
         id: `${f.name}-${Date.now()}-${Math.random()}`,
         name: f.name,
         progress: 0,
@@ -32,7 +37,7 @@ export function UploadZone() {
       setUploads((prev) => [...prev, ...entries]);
 
       await Promise.all(
-        valid.map(async (file, i) => {
+        ready.map(async (file, i) => {
           const id = entries[i].id;
           try {
             await upload(file.name, file, {
