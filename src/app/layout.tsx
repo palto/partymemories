@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Party Memories",
-  description: "Capture and relive your best party moments",
+  title: "Aavan ristiäiset",
+  description: "Jaa juhlasta ottamasi kuvat ja videot — rakennetaan yhdessä muisto tästä erityisestä päivästä.",
 };
 
 export default function RootLayout({
