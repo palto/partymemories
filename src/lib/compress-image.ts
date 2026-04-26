@@ -1,13 +1,11 @@
 const MAX_DIMENSION = 1600;
-const JPEG_QUALITY = 0.8;
+const WEBP_QUALITY = 0.75;
+const JPEG_QUALITY = 0.85;
 
 export async function compressImage(file: File): Promise<File> {
   if (file.type === "image/gif") return file;
 
   try {
-    const outputType = file.type === "image/png" ? "image/png" : "image/jpeg";
-    const quality = outputType === "image/jpeg" ? JPEG_QUALITY : undefined;
-
     const img = await loadImage(file);
 
     let w = img.naturalWidth;
@@ -24,15 +22,26 @@ export async function compressImage(file: File): Promise<File> {
     canvas.height = h;
     canvas.getContext("2d")!.drawImage(img, 0, 0, w, h);
 
-    const blob = await canvasToBlob(canvas, outputType, quality);
+    if (file.type === "image/png") {
+      const blob = await canvasToBlob(canvas, "image/png", undefined);
+      if (blob.size >= file.size) return file;
+      return new File([blob], file.name, { type: "image/png" });
+    }
 
-    if (blob.size >= file.size) return file;
+    // Try WebP first; fall back to JPEG if the browser didn't actually encode it as WebP.
+    const webpBlob = await canvasToBlob(canvas, "image/webp", WEBP_QUALITY);
+    if (webpBlob.type === "image/webp") {
+      if (webpBlob.size >= file.size) return file;
+      const name = file.name.replace(/\.[^/.]+$/, "") + ".webp";
+      return new File([webpBlob], name, { type: "image/webp" });
+    }
 
-    const name = outputType === "image/jpeg" && !/\.jpe?g$/i.test(file.name)
-      ? file.name.replace(/\.[^/.]+$/, "") + ".jpg"
-      : file.name;
-
-    return new File([blob], name, { type: outputType });
+    const jpegBlob = await canvasToBlob(canvas, "image/jpeg", JPEG_QUALITY);
+    if (jpegBlob.size >= file.size) return file;
+    const name = /\.jpe?g$/i.test(file.name)
+      ? file.name
+      : file.name.replace(/\.[^/.]+$/, "") + ".jpg";
+    return new File([jpegBlob], name, { type: "image/jpeg" });
   } catch {
     return file;
   }

@@ -160,6 +160,8 @@ export function MediaGrid({ blobs }: { blobs: ListBlobResultBlob[] }) {
                 <p className="text-white/50 text-xs tabular-nums">
                   {dims ? <>{dims.w}×{dims.h}&nbsp;·&nbsp;</> : null}
                   {formatBytes(selected.size)}
+                  &nbsp;·&nbsp;
+                  {(selected.pathname.match(/\.([^.]+)$/) ?? [])[1]?.toUpperCase() ?? "?"}
                 </p>
               )}
               <Button variant="destructive" size="sm" onClick={confirmDelete}>
