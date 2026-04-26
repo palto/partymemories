@@ -18,9 +18,6 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Aavan ristiäiset",
   description: "Jaa juhlasta ottamasi kuvat ja videot — rakennetaan yhdessä muisto tästä erityisestä päivästä.",
-  icons: {
-    icon: { url: "https://yzscvkujys6lbqov.public.blob.vercel-storage.com/aava.jpeg", type: "image/jpeg" },
-  },
   robots: {
     index: false,
     follow: false,
