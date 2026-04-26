@@ -45,9 +45,7 @@ export async function compressImage(file: File): Promise<File> {
 
     const blob = await canvasToBlob(canvas, outputType, quality);
 
-    // Skip size guard when the format is changing — user explicitly wants WebP/JPEG output.
-    // Only bail out when re-encoding to the same format yields no savings.
-    if (outputType === file.type && blob.size >= file.size) return file;
+    if (blob.size >= file.size) return file;
 
     let name = file.name;
     if (outputType === "image/webp" && !/\.webp$/i.test(file.name)) {
