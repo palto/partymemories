@@ -2,31 +2,10 @@ const MAX_DIMENSION = 1600;
 const WEBP_QUALITY = 0.75;
 const JPEG_QUALITY = 0.85;
 
-function supportsWebP(): boolean {
-  const canvas = document.createElement("canvas");
-  canvas.width = 1;
-  canvas.height = 1;
-  return canvas.toDataURL("image/webp").startsWith("data:image/webp");
-}
-
 export async function compressImage(file: File): Promise<File> {
   if (file.type === "image/gif") return file;
 
   try {
-    let outputType: string;
-    let quality: number | undefined;
-
-    if (file.type === "image/png") {
-      outputType = "image/png";
-      quality = undefined;
-    } else if (supportsWebP()) {
-      outputType = "image/webp";
-      quality = WEBP_QUALITY;
-    } else {
-      outputType = "image/jpeg";
-      quality = JPEG_QUALITY;
-    }
-
     const img = await loadImage(file);
 
     let w = img.naturalWidth;
@@ -43,18 +22,26 @@ export async function compressImage(file: File): Promise<File> {
     canvas.height = h;
     canvas.getContext("2d")!.drawImage(img, 0, 0, w, h);
 
-    const blob = await canvasToBlob(canvas, outputType, quality);
-
-    if (blob.size >= file.size) return file;
-
-    let name = file.name;
-    if (outputType === "image/webp" && !/\.webp$/i.test(file.name)) {
-      name = file.name.replace(/\.[^/.]+$/, "") + ".webp";
-    } else if (outputType === "image/jpeg" && !/\.jpe?g$/i.test(file.name)) {
-      name = file.name.replace(/\.[^/.]+$/, "") + ".jpg";
+    if (file.type === "image/png") {
+      const blob = await canvasToBlob(canvas, "image/png", undefined);
+      if (blob.size >= file.size) return file;
+      return new File([blob], file.name, { type: "image/png" });
     }
 
-    return new File([blob], name, { type: outputType });
+    // Try WebP first; fall back to JPEG if the browser didn't actually encode it as WebP.
+    const webpBlob = await canvasToBlob(canvas, "image/webp", WEBP_QUALITY);
+    if (webpBlob.type === "image/webp") {
+      if (webpBlob.size >= file.size) return file;
+      const name = file.name.replace(/\.[^/.]+$/, "") + ".webp";
+      return new File([webpBlob], name, { type: "image/webp" });
+    }
+
+    const jpegBlob = await canvasToBlob(canvas, "image/jpeg", JPEG_QUALITY);
+    if (jpegBlob.size >= file.size) return file;
+    const name = /\.jpe?g$/i.test(file.name)
+      ? file.name
+      : file.name.replace(/\.[^/.]+$/, "") + ".jpg";
+    return new File([jpegBlob], name, { type: "image/jpeg" });
   } catch {
     return file;
   }
