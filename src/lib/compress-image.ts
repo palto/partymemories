@@ -1,5 +1,5 @@
 const MAX_DIMENSION = 1600;
-const WEBP_QUALITY = 0.85;
+const WEBP_QUALITY = 0.75;
 const JPEG_QUALITY = 0.85;
 
 function supportsWebP(): boolean {
