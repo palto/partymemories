@@ -18,6 +18,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Aavan ristiäiset",
   description: "Jaa juhlasta ottamasi kuvat ja videot — rakennetaan yhdessä muisto tästä erityisestä päivästä.",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default function RootLayout({
