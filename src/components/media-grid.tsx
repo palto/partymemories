@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { ListBlobResultBlob } from "@vercel/blob";
-import { Trash2, X } from "lucide-react";
+import { Download, Trash2, X } from "lucide-react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,18 @@ function formatBytes(bytes: number): string {
 }
 
 const VIDEO_EXTENSIONS = /\.(mp4|webm|mov|avi|mkv)$/i;
+
+async function downloadBlob(blob: ListBlobResultBlob) {
+  const filename = blob.pathname.split("/").pop() ?? "download";
+  const res = await fetch(blob.url);
+  const data = await res.blob();
+  const url = URL.createObjectURL(data);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 function VideoTile({
   blob,
@@ -115,13 +127,22 @@ function ImageLightbox({
         >
           <X size={24} />
         </button>
-        <button
-          className="pointer-events-auto p-2 text-white/80 hover:text-red-400 transition-colors"
-          onClick={onDelete}
-          aria-label="Poista"
-        >
-          <Trash2 size={20} />
-        </button>
+        <div className="pointer-events-auto flex items-center gap-1">
+          <button
+            className="p-2 text-white/80 hover:text-white transition-colors"
+            onClick={() => downloadBlob(blob)}
+            aria-label="Lataa"
+          >
+            <Download size={20} />
+          </button>
+          <button
+            className="p-2 text-white/80 hover:text-red-400 transition-colors"
+            onClick={onDelete}
+            aria-label="Poista"
+          >
+            <Trash2 size={20} />
+          </button>
+        </div>
       </div>
 
       {/* zoomable image — double-tap or pinch to zoom */}
@@ -190,13 +211,22 @@ function VideoLightbox({
         >
           <X size={24} />
         </button>
-        <button
-          className="pointer-events-auto p-2 text-white/80 hover:text-red-400 transition-colors"
-          onClick={onDelete}
-          aria-label="Poista"
-        >
-          <Trash2 size={20} />
-        </button>
+        <div className="pointer-events-auto flex items-center gap-1">
+          <button
+            className="p-2 text-white/80 hover:text-white transition-colors"
+            onClick={() => downloadBlob(blob)}
+            aria-label="Lataa"
+          >
+            <Download size={20} />
+          </button>
+          <button
+            className="p-2 text-white/80 hover:text-red-400 transition-colors"
+            onClick={onDelete}
+            aria-label="Poista"
+          >
+            <Trash2 size={20} />
+          </button>
+        </div>
       </div>
       <video
         key={blob.url}
