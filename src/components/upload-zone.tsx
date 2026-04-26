@@ -3,7 +3,7 @@
 import { useCallback, useRef, useState } from "react";
 import { upload } from "@vercel/blob/client";
 import { useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
+import { ImagePlus } from "lucide-react";
 import { compressImage } from "@/lib/compress-image";
 
 interface UploadEntry {
@@ -15,7 +15,6 @@ interface UploadEntry {
 export function UploadZone() {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
-  const [isDragging, setIsDragging] = useState(false);
   const [uploads, setUploads] = useState<UploadEntry[]>([]);
 
   const handleFiles = useCallback(
@@ -65,48 +64,26 @@ export function UploadZone() {
     [router]
   );
 
-  const onDrop = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault();
-      setIsDragging(false);
-      handleFiles(Array.from(e.dataTransfer.files));
-    },
-    [handleFiles]
-  );
-
   return (
     <div className="w-full max-w-2xl space-y-3">
-      <div
-        className={cn(
-          "border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-colors select-none",
-          isDragging
-            ? "border-primary bg-primary/5"
-            : "border-border hover:border-primary/50"
-        )}
-        onDragOver={(e) => {
-          e.preventDefault();
-          setIsDragging(true);
-        }}
-        onDragLeave={() => setIsDragging(false)}
-        onDrop={onDrop}
+      <button
+        type="button"
+        className="w-full flex items-center justify-center gap-3 rounded-2xl bg-primary px-6 py-5 text-primary-foreground text-base font-semibold shadow-sm active:scale-95 transition-transform select-none"
         onClick={() => inputRef.current?.click()}
       >
-        <input
-          ref={inputRef}
-          type="file"
-          className="hidden"
-          multiple
-          accept="image/*,video/*"
-          onChange={(e) =>
-            e.target.files && handleFiles(Array.from(e.target.files))
-          }
-        />
-        <p className="text-3xl mb-3">📎</p>
-        <p className="text-sm font-medium">Pudota tiedostot tähän tai klikkaa ladataksesi</p>
-        <p className="text-xs text-muted-foreground mt-1">
-          Kuvat ja videot · enintään 500 Mt kukin
-        </p>
-      </div>
+        <ImagePlus size={22} />
+        Lisää kuvia tai videoita
+      </button>
+      <input
+        ref={inputRef}
+        type="file"
+        className="hidden"
+        multiple
+        accept="image/*,video/*"
+        onChange={(e) =>
+          e.target.files && handleFiles(Array.from(e.target.files))
+        }
+      />
 
       {uploads.length > 0 && (
         <div className="space-y-2">
