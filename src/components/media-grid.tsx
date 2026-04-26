@@ -1,8 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import type { ListBlobResultBlob } from "@vercel/blob";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Trash2 } from "lucide-react";
+import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -82,9 +85,12 @@ function Overlay({ blob }: { blob: ListBlobResultBlob }) {
 }
 
 export function MediaGrid({ blobs }: { blobs: ListBlobResultBlob[] }) {
+  const router = useRouter();
   const [selected, setSelected] = useState<ListBlobResultBlob | null>(null);
   const [dims, setDims] = useState<{ w: number; h: number } | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<ListBlobResultBlob | null>(null);
   const isVideo = selected ? VIDEO_EXTENSIONS.test(selected.pathname) : false;
+  const pendingDeleteIsVideo = pendingDelete ? VIDEO_EXTENSIONS.test(pendingDelete.pathname) : false;
 
   function open(blob: ListBlobResultBlob) {
     setDims(null);
@@ -94,6 +100,23 @@ export function MediaGrid({ blobs }: { blobs: ListBlobResultBlob[] }) {
   function close() {
     setSelected(null);
     setDims(null);
+  }
+
+  function confirmDelete() {
+    const blob = selected;
+    close();
+    setPendingDelete(blob);
+  }
+
+  async function handleDelete() {
+    if (!pendingDelete) return;
+    await fetch("/api/delete", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: pendingDelete.url }),
+    });
+    setPendingDelete(null);
+    router.refresh();
   }
 
   return (
@@ -131,12 +154,33 @@ export function MediaGrid({ blobs }: { blobs: ListBlobResultBlob[] }) {
               }}
             />
           ))}
-          {selected && !isVideo && (
-            <p className="text-white/50 text-xs text-center tabular-nums">
-              {dims ? <>{dims.w}×{dims.h}&nbsp;·&nbsp;</> : null}
-              {formatBytes(selected.size)}
-            </p>
+          {selected && (
+            <div className="flex items-center gap-3">
+              {!isVideo && (
+                <p className="text-white/50 text-xs tabular-nums">
+                  {dims ? <>{dims.w}×{dims.h}&nbsp;·&nbsp;</> : null}
+                  {formatBytes(selected.size)}
+                </p>
+              )}
+              <Button variant="destructive" size="sm" onClick={confirmDelete}>
+                <Trash2 size={14} />
+                Delete
+              </Button>
+            </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={pendingDelete !== null} onOpenChange={(open) => { if (!open) setPendingDelete(null); }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Delete this {pendingDeleteIsVideo ? "video" : "photo"}?</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">This cannot be undone.</p>
+          <DialogFooter>
+            <DialogClose render={<Button variant="ghost" />}>Cancel</DialogClose>
+            <Button variant="destructive" onClick={handleDelete}>Delete</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </>
