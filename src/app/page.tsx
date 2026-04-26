@@ -1,5 +1,6 @@
 import { list } from "@vercel/blob";
 import type { ListBlobResultBlob } from "@vercel/blob";
+import { PARTY_SLUG } from "@/lib/party";
 import { MapPin, Clock, CalendarHeart } from "lucide-react";
 import Image from "next/image";
 import { UploadZone } from "@/components/upload-zone";
@@ -9,7 +10,7 @@ export const dynamic = "force-dynamic";
 
 async function getBlobs(): Promise<ListBlobResultBlob[]> {
   try {
-    const { blobs } = await list();
+    const { blobs } = await list({ prefix: `${PARTY_SLUG}/` });
     return blobs.sort(
       (a, b) =>
         new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()

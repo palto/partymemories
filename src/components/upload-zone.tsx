@@ -5,6 +5,7 @@ import { upload } from "@vercel/blob/client";
 import { useRouter } from "next/navigation";
 import { ImagePlus } from "lucide-react";
 import { compressImage } from "@/lib/compress-image";
+import { PARTY_SLUG } from "@/lib/party";
 
 interface UploadEntry {
   id: string;
@@ -52,7 +53,7 @@ export function UploadZone() {
         ready.map(async (file, i) => {
           const id = entries[i].id;
           try {
-            await upload(file.name, file, {
+            await upload(`${PARTY_SLUG}/${file.name}`, file, {
               access: "public",
               handleUploadUrl: "/api/upload",
               multipart: file.size > 10 * 1024 * 1024,
