@@ -38,12 +38,12 @@ export default async function Home() {
             <CalendarHeart className="size-4 shrink-0" />
             Sunnuntai 26. huhtikuuta 2026
           </span>
-          <span className="hidden sm:block text-border">·</span>
+          <span className="hidden sm:block text-muted-foreground">·</span>
           <span className="flex items-center gap-1.5">
             <Clock className="size-4 shrink-0" />
             Klo 16:00 alkaen
           </span>
-          <span className="hidden sm:block text-border">·</span>
+          <span className="hidden sm:block text-muted-foreground">·</span>
           <span className="flex items-center gap-1.5">
             <MapPin className="size-4 shrink-0" />
             Huhtakoti
