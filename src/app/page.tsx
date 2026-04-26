@@ -1,6 +1,7 @@
 import { list } from "@vercel/blob";
 import type { ListBlobResultBlob } from "@vercel/blob";
 import { MapPin, Clock, CalendarHeart } from "lucide-react";
+import Image from "next/image";
 import { UploadZone } from "@/components/upload-zone";
 import { MediaGrid } from "@/components/media-grid";
 
@@ -24,6 +25,16 @@ export default async function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center gap-10 p-8">
       <section className="w-full max-w-2xl mt-8 text-center space-y-6">
+        <div className="flex justify-center">
+          <Image
+            src="https://yzscvkujys6lbqov.public.blob.vercel-storage.com/aava.jpeg"
+            alt="Aava"
+            width={160}
+            height={160}
+            className="rounded-full object-cover shadow-md"
+            priority
+          />
+        </div>
         <div className="space-y-1">
           <p className="text-muted-foreground text-sm uppercase tracking-widest font-medium">
             Tervetuloa juhlimaan
