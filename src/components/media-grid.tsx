@@ -1,12 +1,23 @@
 "use client";
 
+import { useState } from "react";
 import type { ListBlobResultBlob } from "@vercel/blob";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 const VIDEO_EXTENSIONS = /\.(mp4|webm|mov|avi|mkv)$/i;
 
-function VideoTile({ blob }: { blob: ListBlobResultBlob }) {
+function VideoTile({
+  blob,
+  onOpen,
+}: {
+  blob: ListBlobResultBlob;
+  onOpen: () => void;
+}) {
   return (
-    <div className="relative aspect-square rounded-lg overflow-hidden bg-muted group">
+    <div
+      className="relative aspect-square rounded-lg overflow-hidden bg-muted group cursor-pointer"
+      onClick={onOpen}
+    >
       <video
         src={blob.url}
         className="w-full h-full object-cover"
@@ -29,9 +40,18 @@ function VideoTile({ blob }: { blob: ListBlobResultBlob }) {
   );
 }
 
-function ImageTile({ blob }: { blob: ListBlobResultBlob }) {
+function ImageTile({
+  blob,
+  onOpen,
+}: {
+  blob: ListBlobResultBlob;
+  onOpen: () => void;
+}) {
   return (
-    <div className="relative aspect-square rounded-lg overflow-hidden bg-muted group">
+    <div
+      className="relative aspect-square rounded-lg overflow-hidden bg-muted group cursor-pointer"
+      onClick={onOpen}
+    >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={blob.url}
@@ -56,15 +76,42 @@ function Overlay({ blob }: { blob: ListBlobResultBlob }) {
 }
 
 export function MediaGrid({ blobs }: { blobs: ListBlobResultBlob[] }) {
+  const [selected, setSelected] = useState<ListBlobResultBlob | null>(null);
+  const isVideo = selected ? VIDEO_EXTENSIONS.test(selected.pathname) : false;
+
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 w-full max-w-5xl">
-      {blobs.map((blob) =>
-        VIDEO_EXTENSIONS.test(blob.pathname) ? (
-          <VideoTile key={blob.url} blob={blob} />
-        ) : (
-          <ImageTile key={blob.url} blob={blob} />
-        )
-      )}
-    </div>
+    <>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 w-full max-w-5xl">
+        {blobs.map((blob) =>
+          VIDEO_EXTENSIONS.test(blob.pathname) ? (
+            <VideoTile key={blob.url} blob={blob} onOpen={() => setSelected(blob)} />
+          ) : (
+            <ImageTile key={blob.url} blob={blob} onOpen={() => setSelected(blob)} />
+          )
+        )}
+      </div>
+
+      <Dialog open={selected !== null} onOpenChange={(open) => { if (!open) setSelected(null); }}>
+        <DialogContent className="max-w-[95vw] max-h-[95vh] p-2 flex items-center justify-center bg-black/90 border-none rounded-2xl">
+          {selected && (isVideo ? (
+            <video
+              key={selected.url}
+              src={selected.url}
+              controls
+              autoPlay
+              className="max-w-[90vw] max-h-[85vh] rounded-lg"
+            />
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              key={selected.url}
+              src={selected.url}
+              alt={selected.pathname.split("/").pop() ?? ""}
+              className="max-w-[90vw] max-h-[85vh] rounded-lg object-contain"
+            />
+          ))}
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
