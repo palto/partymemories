@@ -164,7 +164,7 @@ export function MediaGrid({ blobs }: { blobs: ListBlobResultBlob[] }) {
               )}
               <Button variant="destructive" size="sm" onClick={confirmDelete}>
                 <Trash2 size={14} />
-                Delete
+                Poista
               </Button>
             </div>
           )}
@@ -174,12 +174,12 @@ export function MediaGrid({ blobs }: { blobs: ListBlobResultBlob[] }) {
       <Dialog open={pendingDelete !== null} onOpenChange={(open) => { if (!open) setPendingDelete(null); }}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle>Delete this {pendingDeleteIsVideo ? "video" : "photo"}?</DialogTitle>
+            <DialogTitle>Poistetaanko tämä {pendingDeleteIsVideo ? "video" : "kuva"}?</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-muted-foreground">This cannot be undone.</p>
+          <p className="text-sm text-muted-foreground">Toimintoa ei voi peruuttaa.</p>
           <DialogFooter>
-            <DialogClose render={<Button variant="ghost" />}>Cancel</DialogClose>
-            <Button variant="destructive" onClick={handleDelete}>Delete</Button>
+            <DialogClose render={<Button variant="ghost" />}>Peruuta</DialogClose>
+            <Button variant="destructive" onClick={handleDelete}>Poista</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

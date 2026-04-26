@@ -102,9 +102,9 @@ export function UploadZone() {
           }
         />
         <p className="text-3xl mb-3">📎</p>
-        <p className="text-sm font-medium">Drop files here or click to upload</p>
+        <p className="text-sm font-medium">Pudota tiedostot tähän tai klikkaa ladataksesi</p>
         <p className="text-xs text-muted-foreground mt-1">
-          Images and videos · up to 500 MB each
+          Kuvat ja videot · enintään 500 Mt kukin
         </p>
       </div>
 
