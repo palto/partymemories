@@ -1,12 +1,31 @@
 const MAX_DIMENSION = 1600;
-const JPEG_QUALITY = 0.8;
+const WEBP_QUALITY = 0.85;
+const JPEG_QUALITY = 0.85;
+
+function supportsWebP(): boolean {
+  const canvas = document.createElement("canvas");
+  canvas.width = 1;
+  canvas.height = 1;
+  return canvas.toDataURL("image/webp").startsWith("data:image/webp");
+}
 
 export async function compressImage(file: File): Promise<File> {
   if (file.type === "image/gif") return file;
 
   try {
-    const outputType = file.type === "image/png" ? "image/png" : "image/jpeg";
-    const quality = outputType === "image/jpeg" ? JPEG_QUALITY : undefined;
+    let outputType: string;
+    let quality: number | undefined;
+
+    if (file.type === "image/png") {
+      outputType = "image/png";
+      quality = undefined;
+    } else if (supportsWebP()) {
+      outputType = "image/webp";
+      quality = WEBP_QUALITY;
+    } else {
+      outputType = "image/jpeg";
+      quality = JPEG_QUALITY;
+    }
 
     const img = await loadImage(file);
 
@@ -28,9 +47,12 @@ export async function compressImage(file: File): Promise<File> {
 
     if (blob.size >= file.size) return file;
 
-    const name = outputType === "image/jpeg" && !/\.jpe?g$/i.test(file.name)
-      ? file.name.replace(/\.[^/.]+$/, "") + ".jpg"
-      : file.name;
+    let name = file.name;
+    if (outputType === "image/webp" && !/\.webp$/i.test(file.name)) {
+      name = file.name.replace(/\.[^/.]+$/, "") + ".webp";
+    } else if (outputType === "image/jpeg" && !/\.jpe?g$/i.test(file.name)) {
+      name = file.name.replace(/\.[^/.]+$/, "") + ".jpg";
+    }
 
     return new File([blob], name, { type: outputType });
   } catch {
