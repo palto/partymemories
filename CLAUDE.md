@@ -17,6 +17,7 @@ No test runner is configured yet.
 ## Architecture
 
 **Party Memories** is an early-stage Next.js 16 app using the App Router. The stack is:
+
 - **Next.js 16 / React 19 / TypeScript** — App Router only, no Pages Router
 - **Tailwind CSS v4** — configured via `@tailwindcss/postcss`; there is no `tailwind.config.*` file; all theme tokens live in `src/app/globals.css`
 - **shadcn/ui (base-luma variant)** backed by **Base UI** headless primitives — components live in `src/components/ui/`

@@ -13,7 +13,7 @@ async function getBlobs(): Promise<ListBlobResultBlob[]> {
     const { blobs } = await list({ prefix: `${PARTY_SLUG}/` });
     return blobs.sort(
       (a, b) =>
-        new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
+        new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime(),
     );
   } catch {
     return [];

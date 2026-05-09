@@ -5,7 +5,14 @@ import { useRouter } from "next/navigation";
 import type { ListBlobResultBlob } from "@vercel/blob";
 import { Download, Trash2, X } from "lucide-react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
-import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
 function formatBytes(bytes: number): string {
@@ -174,7 +181,11 @@ function ImageLightbox({
       {/* bottom metadata */}
       <div className="absolute bottom-0 inset-x-0 z-10 p-3 pb-safe bg-gradient-to-t from-black/70 to-transparent pointer-events-none">
         <p className="text-white/50 text-xs tabular-nums text-center">
-          {dims ? <>{dims.w}×{dims.h}&nbsp;·&nbsp;</> : null}
+          {dims ? (
+            <>
+              {dims.w}×{dims.h}&nbsp;·&nbsp;
+            </>
+          ) : null}
           {formatBytes(blob.size)}
           &nbsp;·&nbsp;
           {(blob.pathname.match(/\.([^.]+)$/) ?? [])[1]?.toUpperCase() ?? "?"}
@@ -243,9 +254,13 @@ function VideoLightbox({
 export function MediaGrid({ blobs }: { blobs: ListBlobResultBlob[] }) {
   const router = useRouter();
   const [selected, setSelected] = useState<ListBlobResultBlob | null>(null);
-  const [pendingDelete, setPendingDelete] = useState<ListBlobResultBlob | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<ListBlobResultBlob | null>(
+    null,
+  );
   const isVideo = selected ? VIDEO_EXTENSIONS.test(selected.pathname) : false;
-  const pendingDeleteIsVideo = pendingDelete ? VIDEO_EXTENSIONS.test(pendingDelete.pathname) : false;
+  const pendingDeleteIsVideo = pendingDelete
+    ? VIDEO_EXTENSIONS.test(pendingDelete.pathname)
+    : false;
 
   function open(blob: ListBlobResultBlob) {
     setSelected(blob);
@@ -280,26 +295,47 @@ export function MediaGrid({ blobs }: { blobs: ListBlobResultBlob[] }) {
             <VideoTile key={blob.url} blob={blob} onOpen={() => open(blob)} />
           ) : (
             <ImageTile key={blob.url} blob={blob} onOpen={() => open(blob)} />
-          )
+          ),
         )}
       </div>
 
       {selected && !isVideo && (
-        <ImageLightbox blob={selected} onClose={close} onDelete={confirmDelete} />
+        <ImageLightbox
+          blob={selected}
+          onClose={close}
+          onDelete={confirmDelete}
+        />
       )}
       {selected && isVideo && (
-        <VideoLightbox blob={selected} onClose={close} onDelete={confirmDelete} />
+        <VideoLightbox
+          blob={selected}
+          onClose={close}
+          onDelete={confirmDelete}
+        />
       )}
 
-      <Dialog open={pendingDelete !== null} onOpenChange={(open) => { if (!open) setPendingDelete(null); }}>
+      <Dialog
+        open={pendingDelete !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingDelete(null);
+        }}
+      >
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle>Poistetaanko tämä {pendingDeleteIsVideo ? "video" : "kuva"}?</DialogTitle>
+            <DialogTitle>
+              Poistetaanko tämä {pendingDeleteIsVideo ? "video" : "kuva"}?
+            </DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-muted-foreground">Toimintoa ei voi peruuttaa.</p>
+          <p className="text-sm text-muted-foreground">
+            Toimintoa ei voi peruuttaa.
+          </p>
           <DialogFooter>
-            <DialogClose render={<Button variant="ghost" />}>Peruuta</DialogClose>
-            <Button variant="destructive" onClick={handleDelete}>Poista</Button>
+            <DialogClose render={<Button variant="ghost" />}>
+              Peruuta
+            </DialogClose>
+            <Button variant="destructive" onClick={handleDelete}>
+              Poista
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
