@@ -25,7 +25,9 @@ export function UploadZone() {
     if (!el) return;
     const observer = new IntersectionObserver(
       ([entry]) => setShowFab(!entry.isIntersecting),
-      { threshold: 0.5 }
+      {
+        threshold: 0.5,
+      },
     );
     observer.observe(el);
     return () => observer.disconnect();
@@ -34,12 +36,14 @@ export function UploadZone() {
   const handleFiles = useCallback(
     async (files: File[]) => {
       const valid = files.filter(
-        (f) => f.type.startsWith("image/") || f.type.startsWith("video/")
+        (f) => f.type.startsWith("image/") || f.type.startsWith("video/"),
       );
       if (!valid.length) return;
 
       const ready = await Promise.all(
-        valid.map((f) => f.type.startsWith("image/") ? compressImage(f) : Promise.resolve(f))
+        valid.map((f) =>
+          f.type.startsWith("image/") ? compressImage(f) : Promise.resolve(f),
+        ),
       );
 
       const entries: UploadEntry[] = ready.map((f) => ({
@@ -60,8 +64,8 @@ export function UploadZone() {
               onUploadProgress: ({ percentage }) => {
                 setUploads((prev) =>
                   prev.map((u) =>
-                    u.id === id ? { ...u, progress: percentage } : u
-                  )
+                    u.id === id ? { ...u, progress: percentage } : u,
+                  ),
                 );
               },
             });
@@ -70,12 +74,12 @@ export function UploadZone() {
           } finally {
             setUploads((prev) => prev.filter((u) => u.id !== id));
           }
-        })
+        }),
       );
 
       router.refresh();
     },
-    [router]
+    [router],
   );
 
   return (
