@@ -24,30 +24,28 @@ function formatBytes(bytes: number): string {
 const VIDEO_EXTENSIONS = /\.(mp4|webm|mov|avi|mkv)$/i;
 
 const canWebShare =
-  typeof navigator !== "undefined" &&
-  typeof navigator.canShare === "function" &&
-  typeof window !== "undefined" &&
-  window.matchMedia("(pointer: coarse)").matches;
+  typeof navigator !== "undefined" && typeof navigator.canShare === "function";
 
-async function shareOrDownload(blob: ListBlobResultBlob) {
+async function downloadBlob(blob: ListBlobResultBlob) {
   const filename = blob.pathname.split("/").pop() ?? "download";
   const res = await fetch(blob.url);
   const data = await res.blob();
-
-  if (canWebShare) {
-    const file = new File([data], filename, { type: data.type });
-    if (navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: filename });
-      return;
-    }
-  }
-
   const url = URL.createObjectURL(data);
   const a = document.createElement("a");
   a.href = url;
   a.download = filename;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+async function shareBlob(blob: ListBlobResultBlob) {
+  const filename = blob.pathname.split("/").pop() ?? "download";
+  const res = await fetch(blob.url);
+  const data = await res.blob();
+  const file = new File([data], filename, { type: data.type });
+  if (navigator.canShare({ files: [file] })) {
+    await navigator.share({ files: [file], title: filename });
+  }
 }
 
 function VideoTile({
@@ -150,12 +148,21 @@ function ImageLightbox({
           <X size={24} />
         </button>
         <div className="pointer-events-auto flex items-center gap-1">
+          {canWebShare && (
+            <button
+              className="p-2 text-white/80 hover:text-white transition-colors"
+              onClick={() => shareBlob(blob)}
+              aria-label="Jaa"
+            >
+              <Share2 size={20} />
+            </button>
+          )}
           <button
             className="p-2 text-white/80 hover:text-white transition-colors"
-            onClick={() => shareOrDownload(blob)}
-            aria-label={canWebShare ? "Jaa" : "Lataa"}
+            onClick={() => downloadBlob(blob)}
+            aria-label="Lataa"
           >
-            {canWebShare ? <Share2 size={20} /> : <Download size={20} />}
+            <Download size={20} />
           </button>
           <button
             className="p-2 text-white/80 hover:text-red-400 transition-colors"
@@ -238,12 +245,21 @@ function VideoLightbox({
           <X size={24} />
         </button>
         <div className="pointer-events-auto flex items-center gap-1">
+          {canWebShare && (
+            <button
+              className="p-2 text-white/80 hover:text-white transition-colors"
+              onClick={() => shareBlob(blob)}
+              aria-label="Jaa"
+            >
+              <Share2 size={20} />
+            </button>
+          )}
           <button
             className="p-2 text-white/80 hover:text-white transition-colors"
-            onClick={() => shareOrDownload(blob)}
-            aria-label={canWebShare ? "Jaa" : "Lataa"}
+            onClick={() => downloadBlob(blob)}
+            aria-label="Lataa"
           >
-            {canWebShare ? <Share2 size={20} /> : <Download size={20} />}
+            <Download size={20} />
           </button>
           <button
             className="p-2 text-white/80 hover:text-red-400 transition-colors"
