@@ -65,8 +65,13 @@ function MediaMenu({
         <MoreVertical size={20} />
       </Menu.Trigger>
       <Menu.Portal>
-        <Menu.Positioner side="bottom" align="end" sideOffset={4}>
-          <Menu.Popup className="z-50 min-w-36 rounded-2xl bg-white py-1 shadow-lg outline-none dark:bg-neutral-900">
+        <Menu.Positioner
+          side="bottom"
+          align="end"
+          sideOffset={4}
+          className="z-[60]"
+        >
+          <Menu.Popup className="min-w-36 rounded-2xl bg-white py-1 shadow-lg outline-none dark:bg-neutral-900">
             <Menu.Item
               className="flex cursor-pointer items-center gap-2 px-3 py-2 text-sm text-neutral-800 outline-none hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-800"
               onClick={() => downloadBlob(blob)}
