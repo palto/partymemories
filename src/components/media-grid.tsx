@@ -314,10 +314,11 @@ function BulkDownloadBar({ blobs }: { blobs: ListBlobResultBlob[] }) {
 
   return (
     <div className="flex items-center gap-3 w-full max-w-5xl">
-      <button
+      <Button
+        variant="ghost"
+        size="sm"
         onClick={() => (busy ? abort() : download(blobs))}
         disabled={state.status === "done" || state.status === "error"}
-        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         aria-label="Lataa kaikki"
       >
         {state.status === "idle" && (
@@ -350,7 +351,7 @@ function BulkDownloadBar({ blobs }: { blobs: ListBlobResultBlob[] }) {
             {state.message}
           </>
         )}
-      </button>
+      </Button>
 
       {state.status === "downloading" && (
         <div className="flex-1 h-1 rounded-full bg-muted overflow-hidden">
