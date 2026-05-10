@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { ListBlobResultBlob } from "@vercel/blob";
-import { Download, Share2, Trash2, X } from "lucide-react";
+import { Download, MoreVertical, Share2, Trash2, X } from "lucide-react";
+import { Menu } from "@base-ui/react/menu";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import {
   Dialog,
@@ -46,6 +47,46 @@ async function shareBlob(blob: ListBlobResultBlob) {
   if (navigator.canShare({ files: [file] })) {
     await navigator.share({ files: [file], title: filename });
   }
+}
+
+function MediaMenu({
+  blob,
+  onDelete,
+}: {
+  blob: ListBlobResultBlob;
+  onDelete: () => void;
+}) {
+  return (
+    <Menu.Root>
+      <Menu.Trigger
+        className="p-2 text-white/80 hover:text-white transition-colors"
+        aria-label="Lisää toimintoja"
+      >
+        <MoreVertical size={20} />
+      </Menu.Trigger>
+      <Menu.Portal>
+        <Menu.Positioner side="bottom" align="end" sideOffset={4}>
+          <Menu.Popup className="z-50 min-w-36 rounded-2xl bg-white py-1 shadow-lg outline-none dark:bg-neutral-900">
+            <Menu.Item
+              className="flex cursor-pointer items-center gap-2 px-3 py-2 text-sm text-neutral-800 outline-none hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-800"
+              onClick={() => downloadBlob(blob)}
+            >
+              <Download size={15} />
+              Lataa
+            </Menu.Item>
+            <Menu.Separator className="my-1 h-px bg-neutral-200 dark:bg-neutral-700" />
+            <Menu.Item
+              className="flex cursor-pointer items-center gap-2 px-3 py-2 text-sm text-red-500 outline-none hover:bg-neutral-100 dark:hover:bg-neutral-800"
+              onClick={onDelete}
+            >
+              <Trash2 size={15} />
+              Poista
+            </Menu.Item>
+          </Menu.Popup>
+        </Menu.Positioner>
+      </Menu.Portal>
+    </Menu.Root>
+  );
 }
 
 function VideoTile({
@@ -157,20 +198,7 @@ function ImageLightbox({
               <Share2 size={20} />
             </button>
           )}
-          <button
-            className="p-2 text-white/80 hover:text-white transition-colors"
-            onClick={() => downloadBlob(blob)}
-            aria-label="Lataa"
-          >
-            <Download size={20} />
-          </button>
-          <button
-            className="p-2 text-white/80 hover:text-red-400 transition-colors"
-            onClick={onDelete}
-            aria-label="Poista"
-          >
-            <Trash2 size={20} />
-          </button>
+          <MediaMenu blob={blob} onDelete={onDelete} />
         </div>
       </div>
 
@@ -254,20 +282,7 @@ function VideoLightbox({
               <Share2 size={20} />
             </button>
           )}
-          <button
-            className="p-2 text-white/80 hover:text-white transition-colors"
-            onClick={() => downloadBlob(blob)}
-            aria-label="Lataa"
-          >
-            <Download size={20} />
-          </button>
-          <button
-            className="p-2 text-white/80 hover:text-red-400 transition-colors"
-            onClick={onDelete}
-            aria-label="Poista"
-          >
-            <Trash2 size={20} />
-          </button>
+          <MediaMenu blob={blob} onDelete={onDelete} />
         </div>
       </div>
       <video
