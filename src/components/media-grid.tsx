@@ -3,7 +3,17 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { ListBlobResultBlob } from "@vercel/blob";
-import { Download, MoreVertical, Share2, Trash2, X, Archive, Loader2, CircleCheck, CircleX } from "lucide-react";
+import {
+  Download,
+  MoreVertical,
+  Share2,
+  Trash2,
+  X,
+  Archive,
+  Loader2,
+  CircleCheck,
+  CircleX,
+} from "lucide-react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import {
   Dialog,
@@ -298,14 +308,9 @@ function VideoLightbox({
   );
 }
 
-function BulkDownloadBar({
-  blobs,
-}: {
-  blobs: ListBlobResultBlob[];
-}) {
+function BulkDownloadBar({ blobs }: { blobs: ListBlobResultBlob[] }) {
   const { state, download, abort } = useBulkDownload();
-  const busy =
-    state.status === "downloading" || state.status === "zipping";
+  const busy = state.status === "downloading" || state.status === "zipping";
 
   return (
     <div className="flex items-center gap-3 w-full max-w-5xl">

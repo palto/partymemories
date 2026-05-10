@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef } from "react";
-import { zipSync, strToU8 } from "fflate";
+import { zipSync } from "fflate";
 import type { ListBlobResultBlob } from "@vercel/blob";
 
 export type BulkDownloadState =
