@@ -3,7 +3,17 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { ListBlobResultBlob } from "@vercel/blob";
-import { Download, MoreVertical, Share2, Trash2, X } from "lucide-react";
+import {
+  Download,
+  MoreVertical,
+  Share2,
+  Trash2,
+  X,
+  Archive,
+  Loader2,
+  CircleCheck,
+  CircleX,
+} from "lucide-react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import {
   Dialog,
@@ -21,6 +31,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useBulkDownload } from "@/lib/use-bulk-download";
 
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -297,6 +308,65 @@ function VideoLightbox({
   );
 }
 
+function BulkDownloadBar({ blobs }: { blobs: ListBlobResultBlob[] }) {
+  const { state, download, abort } = useBulkDownload();
+  const busy = state.status === "downloading" || state.status === "zipping";
+
+  return (
+    <div className="flex items-center gap-3 w-full max-w-5xl">
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => (busy ? abort() : download(blobs))}
+        disabled={state.status === "done" || state.status === "error"}
+        aria-label="Lataa kaikki"
+      >
+        {state.status === "idle" && (
+          <>
+            <Archive size={16} />
+            Lataa kaikki
+          </>
+        )}
+        {state.status === "downloading" && (
+          <>
+            <Loader2 size={16} className="animate-spin" />
+            {state.done} / {state.total} ladattu — peruuta
+          </>
+        )}
+        {state.status === "zipping" && (
+          <>
+            <Loader2 size={16} className="animate-spin" />
+            Pakataan…
+          </>
+        )}
+        {state.status === "done" && (
+          <>
+            <CircleCheck size={16} className="text-green-500" />
+            Valmis!
+          </>
+        )}
+        {state.status === "error" && (
+          <>
+            <CircleX size={16} className="text-destructive" />
+            {state.message}
+          </>
+        )}
+      </Button>
+
+      {state.status === "downloading" && (
+        <div className="flex-1 h-1 rounded-full bg-muted overflow-hidden">
+          <div
+            className="h-full bg-primary rounded-full transition-all duration-300"
+            style={{
+              width: `${Math.round((state.done / state.total) * 100)}%`,
+            }}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function MediaGrid({ blobs }: { blobs: ListBlobResultBlob[] }) {
   const router = useRouter();
   const [selected, setSelected] = useState<ListBlobResultBlob | null>(null);
@@ -335,6 +405,7 @@ export function MediaGrid({ blobs }: { blobs: ListBlobResultBlob[] }) {
 
   return (
     <>
+      <BulkDownloadBar blobs={blobs} />
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 w-full max-w-5xl">
         {blobs.map((blob) =>
           VIDEO_EXTENSIONS.test(blob.pathname) ? (
