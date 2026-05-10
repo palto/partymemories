@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { ListBlobResultBlob } from "@vercel/blob";
 import { Download, MoreVertical, Share2, Trash2, X } from "lucide-react";
-import { Menu } from "@base-ui/react/menu";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import {
   Dialog,
@@ -15,6 +14,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -57,40 +63,29 @@ function MediaMenu({
   onDelete: () => void;
 }) {
   return (
-    <Menu.Root>
-      <Menu.Trigger
+    <DropdownMenu>
+      <DropdownMenuTrigger
         className="p-2 text-white/80 hover:text-white transition-colors"
         aria-label="Lisää toimintoja"
       >
         <MoreVertical size={20} />
-      </Menu.Trigger>
-      <Menu.Portal>
-        <Menu.Positioner
-          side="bottom"
-          align="end"
-          sideOffset={4}
-          className="z-[60]"
-        >
-          <Menu.Popup className="min-w-36 rounded-2xl bg-white py-1 shadow-lg outline-none dark:bg-neutral-900">
-            <Menu.Item
-              className="flex cursor-pointer items-center gap-2 px-3 py-2 text-sm text-neutral-800 outline-none hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-800"
-              onClick={() => downloadBlob(blob)}
-            >
-              <Download size={15} />
-              Lataa
-            </Menu.Item>
-            <Menu.Separator className="my-1 h-px bg-neutral-200 dark:bg-neutral-700" />
-            <Menu.Item
-              className="flex cursor-pointer items-center gap-2 px-3 py-2 text-sm text-red-500 outline-none hover:bg-neutral-100 dark:hover:bg-neutral-800"
-              onClick={onDelete}
-            >
-              <Trash2 size={15} />
-              Poista
-            </Menu.Item>
-          </Menu.Popup>
-        </Menu.Positioner>
-      </Menu.Portal>
-    </Menu.Root>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        side="bottom"
+        align="end"
+        positionerClassName="z-[60]"
+      >
+        <DropdownMenuItem onClick={() => downloadBlob(blob)}>
+          <Download />
+          Lataa
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem variant="destructive" onClick={onDelete}>
+          <Trash2 />
+          Poista
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
