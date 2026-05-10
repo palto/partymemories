@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { ListBlobResultBlob } from "@vercel/blob";
-import { Download, Trash2, X } from "lucide-react";
+import { Download, Share2, Trash2, X } from "lucide-react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import {
   Dialog,
@@ -23,10 +23,23 @@ function formatBytes(bytes: number): string {
 
 const VIDEO_EXTENSIONS = /\.(mp4|webm|mov|avi|mkv)$/i;
 
-async function downloadBlob(blob: ListBlobResultBlob) {
+const canWebShare =
+  typeof navigator !== "undefined" &&
+  typeof navigator.canShare === "function";
+
+async function shareOrDownload(blob: ListBlobResultBlob) {
   const filename = blob.pathname.split("/").pop() ?? "download";
   const res = await fetch(blob.url);
   const data = await res.blob();
+
+  if (canWebShare) {
+    const file = new File([data], filename, { type: data.type });
+    if (navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: filename });
+      return;
+    }
+  }
+
   const url = URL.createObjectURL(data);
   const a = document.createElement("a");
   a.href = url;
@@ -137,10 +150,10 @@ function ImageLightbox({
         <div className="pointer-events-auto flex items-center gap-1">
           <button
             className="p-2 text-white/80 hover:text-white transition-colors"
-            onClick={() => downloadBlob(blob)}
-            aria-label="Lataa"
+            onClick={() => shareOrDownload(blob)}
+            aria-label={canWebShare ? "Jaa" : "Lataa"}
           >
-            <Download size={20} />
+            {canWebShare ? <Share2 size={20} /> : <Download size={20} />}
           </button>
           <button
             className="p-2 text-white/80 hover:text-red-400 transition-colors"
@@ -225,10 +238,10 @@ function VideoLightbox({
         <div className="pointer-events-auto flex items-center gap-1">
           <button
             className="p-2 text-white/80 hover:text-white transition-colors"
-            onClick={() => downloadBlob(blob)}
-            aria-label="Lataa"
+            onClick={() => shareOrDownload(blob)}
+            aria-label={canWebShare ? "Jaa" : "Lataa"}
           >
-            <Download size={20} />
+            {canWebShare ? <Share2 size={20} /> : <Download size={20} />}
           </button>
           <button
             className="p-2 text-white/80 hover:text-red-400 transition-colors"
