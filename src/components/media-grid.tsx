@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { ListBlobResultBlob } from "@vercel/blob";
-import { Download, Trash2, X } from "lucide-react";
+import { Download, MoreVertical, Share2, Trash2, X } from "lucide-react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import {
   Dialog,
@@ -14,6 +14,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -22,6 +29,9 @@ function formatBytes(bytes: number): string {
 }
 
 const VIDEO_EXTENSIONS = /\.(mp4|webm|mov|avi|mkv)$/i;
+
+const canWebShare =
+  typeof navigator !== "undefined" && typeof navigator.canShare === "function";
 
 async function downloadBlob(blob: ListBlobResultBlob) {
   const filename = blob.pathname.split("/").pop() ?? "download";
@@ -33,6 +43,50 @@ async function downloadBlob(blob: ListBlobResultBlob) {
   a.download = filename;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+async function shareBlob(blob: ListBlobResultBlob) {
+  const filename = blob.pathname.split("/").pop() ?? "download";
+  const res = await fetch(blob.url);
+  const data = await res.blob();
+  const file = new File([data], filename, { type: data.type });
+  if (navigator.canShare({ files: [file] })) {
+    await navigator.share({ files: [file], title: filename });
+  }
+}
+
+function MediaMenu({
+  blob,
+  onDelete,
+}: {
+  blob: ListBlobResultBlob;
+  onDelete: () => void;
+}) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        className="p-2 text-white/80 hover:text-white transition-colors"
+        aria-label="Lisää toimintoja"
+      >
+        <MoreVertical size={20} />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        side="bottom"
+        align="end"
+        positionerClassName="z-[60]"
+      >
+        <DropdownMenuItem onClick={() => downloadBlob(blob)}>
+          <Download />
+          Lataa
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem variant="destructive" onClick={onDelete}>
+          <Trash2 />
+          Poista
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 }
 
 function VideoTile({
@@ -135,20 +189,16 @@ function ImageLightbox({
           <X size={24} />
         </button>
         <div className="pointer-events-auto flex items-center gap-1">
-          <button
-            className="p-2 text-white/80 hover:text-white transition-colors"
-            onClick={() => downloadBlob(blob)}
-            aria-label="Lataa"
-          >
-            <Download size={20} />
-          </button>
-          <button
-            className="p-2 text-white/80 hover:text-red-400 transition-colors"
-            onClick={onDelete}
-            aria-label="Poista"
-          >
-            <Trash2 size={20} />
-          </button>
+          {canWebShare && (
+            <button
+              className="p-2 text-white/80 hover:text-white transition-colors"
+              onClick={() => shareBlob(blob)}
+              aria-label="Jaa"
+            >
+              <Share2 size={20} />
+            </button>
+          )}
+          <MediaMenu blob={blob} onDelete={onDelete} />
         </div>
       </div>
 
@@ -223,20 +273,16 @@ function VideoLightbox({
           <X size={24} />
         </button>
         <div className="pointer-events-auto flex items-center gap-1">
-          <button
-            className="p-2 text-white/80 hover:text-white transition-colors"
-            onClick={() => downloadBlob(blob)}
-            aria-label="Lataa"
-          >
-            <Download size={20} />
-          </button>
-          <button
-            className="p-2 text-white/80 hover:text-red-400 transition-colors"
-            onClick={onDelete}
-            aria-label="Poista"
-          >
-            <Trash2 size={20} />
-          </button>
+          {canWebShare && (
+            <button
+              className="p-2 text-white/80 hover:text-white transition-colors"
+              onClick={() => shareBlob(blob)}
+              aria-label="Jaa"
+            >
+              <Share2 size={20} />
+            </button>
+          )}
+          <MediaMenu blob={blob} onDelete={onDelete} />
         </div>
       </div>
       <video
