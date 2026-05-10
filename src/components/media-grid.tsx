@@ -24,8 +24,7 @@ function formatBytes(bytes: number): string {
 const VIDEO_EXTENSIONS = /\.(mp4|webm|mov|avi|mkv)$/i;
 
 const canWebShare =
-  typeof navigator !== "undefined" &&
-  typeof navigator.canShare === "function";
+  typeof navigator !== "undefined" && typeof navigator.canShare === "function";
 
 async function shareOrDownload(blob: ListBlobResultBlob) {
   const filename = blob.pathname.split("/").pop() ?? "download";
