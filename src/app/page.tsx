@@ -38,7 +38,7 @@ export default async function Home() {
         </div>
         <div className="space-y-1">
           <p className="text-muted-foreground text-sm uppercase tracking-widest font-medium">
-            Tervetuloa juhlimaan
+            Tervetuloa juhlimaan · Bienvenue pour fêter
           </p>
           <h1 className="text-4xl font-bold tracking-tight">
             Aavan ristiäiset
